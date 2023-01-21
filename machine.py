@@ -295,11 +295,11 @@ def simulation(init_data: list[int], instructions: list[Instruction],
 
     output: str = ''
     for it in data_path.get_output_buffer():
-        # if 0 <= i < 256:
-        #     output += chr(i)
-        # else:
-        #     output += '[' + str(i) + ']'
-        output += '[' + str(it) + ']'
+        if 0 <= it < 256:
+            output += chr(it)
+        else:
+            output += '[' + str(it) + ']'
+        # output += '[' + str(it) + ']'
 
     logging.info('output_buffer: %s', output)
     return output, instr_counter, control_unit.tick_counter
@@ -326,10 +326,10 @@ if __name__ == '__main__':
     logging.getLogger().setLevel(logging.DEBUG)
     main(sys.argv[1:])
 
-    store: int = 0
-    for i in range(0, 1000):
-        if i % 15 == 0:
-            store += i
-        elif i % 3 == 0 or i % 5 == 0:
-            store += i
-    print(store)
+    # store: int = 0
+    # for i in range(0, 1000):
+    #     if i % 15 == 0:
+    #         store += i
+    #     elif i % 3 == 0 or i % 5 == 0:
+    #         store += i
+    # print(store)

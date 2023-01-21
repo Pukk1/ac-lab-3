@@ -7,7 +7,7 @@ l:
 	word 108
 o:
 	word 111
-_:
+space:
 	word 32
 w:
 	word 119
@@ -15,21 +15,28 @@ r:
 	word 114
 d:
 	word 100
-ex_mark:
-	word 33
 section .text
 start:
-	print h
-	print e
-	print l
-	print l
-	print o
-	print _
-	print w
-	print o
-	print r
-	print l
-	print d
-	print ex_mark
+    ld reg1, h
+	print reg1
+	ld reg1, e
+	print reg1
+	ld reg1, l
+	print reg1
+	print reg1
+	ld reg1, o
+	print reg1
+	ld reg1, space
+	print reg1
+	ld reg1, w
+	print reg1
+	ld reg1, o
+	print reg1
+	ld reg1, r
+	print reg1
+	ld reg1, l
+	print reg1
+	ld reg1, d
+	print reg1
 	hlt
 
