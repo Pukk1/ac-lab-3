@@ -1,11 +1,8 @@
 section .data
-tmp:
-	word 0
-
 section .text
 start:
-	read tmp
-	print tmp
+	read reg1
+	print reg1
 	jmp start
 end:
-	exit
+	hlt

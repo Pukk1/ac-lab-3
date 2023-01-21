@@ -87,7 +87,10 @@ class DataPath:
 
     def latch_res(self, res_reg_num: int, sig_input: bool, sig_read_data: bool, sig_output: bool):
         if sig_input:
-            data = int(self._input_buffer.pop(0))
+            try:
+                data = int(self._input_buffer.pop(0))
+            except IndexError:
+                raise EOFError()
         else:
             if sig_read_data:
                 data = self.data_mem.res
@@ -276,7 +279,7 @@ class ControlUnit:
 
 
 def simulation(init_data: list[int], instructions: list[Instruction],
-               input_tokens: list[str], data_memory_size: int, limit: int) -> tuple[str, int, int]:
+               input_tokens: list[int], data_memory_size: int, limit: int) -> tuple[str, int, int]:
     data_path = DataPath(data_memory_size, init_data, input_tokens)
     control_unit = ControlUnit(instructions, data_path)
     instr_counter = 0
@@ -314,6 +317,7 @@ def main(args):
     init_data, instructions = deserialize_bin(bin_lines)
 
     input_tokens: list[str] = read_char_list_from_file(input_file)
+    input_tokens: list[int] = list(map(lambda c: ord(c), input_tokens))
 
     output, instr_counter, ticks \
         = simulation(init_data, instructions, input_tokens, 1024, limit=100000)
