@@ -63,7 +63,7 @@ def read_bin_code_from_file(filename: str, word_size: int) -> list[str]:
         # lines = file_text.split('\n')
         if len(file_text) % word_size != 0:
             assert False, ILLEGAL_BIN_NUMBER.format(len(file_text))
-        for i in range(0, int(len(file_text) / word_size)):
+        for _ in range(0, int(len(file_text) / word_size)):
             lines.append(file_text[:word_size])
             file_text = file_text[word_size:]
     return lines

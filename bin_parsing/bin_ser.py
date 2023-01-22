@@ -40,20 +40,22 @@ def create_bin_instructions(instructions: list[Instruction]) -> tuple[list[str],
 
 
 def bin_args_by_type(args: list[int], op_type: OpcodeOperandsType) -> str:
+    bin_args: str
     if op_type == OpcodeOperandsType.NONE:
-        return number_to_bin(0, 24)
+        bin_args = number_to_bin(0, 24)
     elif op_type == OpcodeOperandsType.CONST:
-        return number_to_bin(args.pop(0), 16) + '0000' + '0000'
+        bin_args = number_to_bin(args.pop(0), 16) + '0000' + '0000'
     elif op_type == OpcodeOperandsType.REG_CONST:
-        return number_to_bin(args.pop(0), 4) + number_to_bin(args.pop(0), 16) + '0000'
+        bin_args = number_to_bin(args.pop(0), 4) + number_to_bin(args.pop(0), 16) + '0000'
     elif op_type == OpcodeOperandsType.REG_REG_REG:
-        return number_to_bin(args.pop(0), 4) + number_to_bin(args.pop(0), 4) \
-            + number_to_bin(args.pop(0), 4) + number_to_bin(0, 12)
+        bin_args = number_to_bin(args.pop(0), 4) + number_to_bin(args.pop(0), 4) \
+                   + number_to_bin(args.pop(0), 4) + number_to_bin(0, 12)
     elif op_type == OpcodeOperandsType.REG_REG_CONST:
-        return number_to_bin(args.pop(0), 4) + number_to_bin(args.pop(0), 4) + number_to_bin(args.pop(0), 16)
+        bin_args = number_to_bin(args.pop(0), 4) + number_to_bin(args.pop(0), 4) + number_to_bin(args.pop(0), 16)
     elif op_type == OpcodeOperandsType.REG:
-        return number_to_bin(args.pop(0), 4) + number_to_bin(0, 20)
+        bin_args = number_to_bin(args.pop(0), 4) + number_to_bin(0, 20)
     elif op_type == OpcodeOperandsType.REG_REG:
-        return number_to_bin(args.pop(0), 4) + number_to_bin(args.pop(0), 4)
+        bin_args = number_to_bin(args.pop(0), 4) + number_to_bin(args.pop(0), 4)
     else:
         assert False, 'Can\'t cast args: ' + str(args) + ' opcode_typed: ' + str(op_type.name)
+    return bin_args
