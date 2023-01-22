@@ -48,8 +48,9 @@ def bin_args_by_type(args: list[int], op_type: OpcodeOperandsType) -> str:
     elif op_type == OpcodeOperandsType.REG_CONST:
         bin_args = number_to_bin(args.pop(0), 4) + number_to_bin(args.pop(0), 16) + '0000'
     elif op_type == OpcodeOperandsType.REG_REG_REG:
-        bin_args = number_to_bin(args.pop(0), 4) + number_to_bin(args.pop(0), 4) \
-                   + number_to_bin(args.pop(0), 4) + number_to_bin(0, 12)
+        bin_args = number_to_bin(args.pop(0), 4) + number_to_bin(args.pop(0), 4) + number_to_bin(args.pop(0),
+                                                                                                 4) + number_to_bin(0,
+                                                                                                                    12)
     elif op_type == OpcodeOperandsType.REG_REG_CONST:
         bin_args = number_to_bin(args.pop(0), 4) + number_to_bin(args.pop(0), 4) + number_to_bin(args.pop(0), 16)
     elif op_type == OpcodeOperandsType.REG:
