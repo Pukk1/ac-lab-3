@@ -54,12 +54,12 @@ class RegFile:
         if op1_reg_num == 0:
             self.op1 = 0
         else:
-            # TODO assert
+
             self.op1 = self._valued_regs[op1_reg_num]
         if op2_reg_num == 0:
             self.op2 = 0
         else:
-            # TODO assert
+
             self.op2 = self._valued_regs[op2_reg_num]
 
     def set_reg_value(self, reg_num: int, value: int):

@@ -17,7 +17,6 @@ class OpcodeOperandsType(int, Enum):
     REG_REG_REG = 0b011
     # 8-11 бит под регистр, 12-15 бит под регистр, 16-31 бит под константу
     REG_REG_CONST = 0b100
-    # TODO
     REG_REG = 0b101
     REG = 0b110
     # REG_CONST_REG = 0b111
