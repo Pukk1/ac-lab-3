@@ -92,8 +92,8 @@ class DataPath:
         if sig_input:
             try:
                 data = int(self._input_buffer.pop(0))
-            except IndexError:
-                raise EOFError()
+            except IndexError as data_empty_except:
+                raise EOFError() from data_empty_except
         else:
             if sig_read_data:
                 data = self.data_mem.res
@@ -218,7 +218,7 @@ class ControlUnit:
 
         if opcode is Opcode.HLT:
             raise StopIteration()
-        elif opcode is Opcode.JMP:
+        if opcode is Opcode.JMP:
             offset: int = instruction.operands[0]
             self.exec_jmp(offset)
         elif opcode is Opcode.BEQ:

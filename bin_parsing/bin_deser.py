@@ -25,7 +25,8 @@ def get_operands(instr: str, operand_type: OpcodeOperandsType) -> list[int]:
     operands: list[int] = []
     if operand_type == OpcodeOperandsType.NONE:
         return operands
-    elif operand_type == OpcodeOperandsType.CONST:
+
+    if operand_type == OpcodeOperandsType.CONST:
         operands.append(bin_to_number(bin_operands_str[:16], True))
     elif operand_type == OpcodeOperandsType.REG_CONST:
         reg_const: str = bin_operands_str[:20]

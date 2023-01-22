@@ -24,15 +24,14 @@ def number_to_bin(value: int, word_length: int) -> str:
 def bin_to_number(value: str, extra_code: bool) -> int:
     if not extra_code or value[0] == '0':
         return int('0b' + value, 2)
-    else:
-        abs_value_bin: str = ''
-        for i in value:
-            if i == '0':
-                abs_value_bin += '1'
-            else:
-                abs_value_bin += '0'
-        abs_value: int = int('0b' + abs_value_bin, 2)
-        return (abs_value + 1) * -1
+    abs_value_bin: str = ''
+    for i in value:
+        if i == '0':
+            abs_value_bin += '1'
+        else:
+            abs_value_bin += '0'
+    abs_value: int = int('0b' + abs_value_bin, 2)
+    return (abs_value + 1) * -1
 
 
 def write_list_to_file(filename: str, lines: list[str], join_str: str) -> None:

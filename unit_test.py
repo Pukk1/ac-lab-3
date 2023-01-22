@@ -11,6 +11,6 @@ import translate.translator
 
 
 @pytest.mark.golden_test("golden/unit/translate/*.yml")
-def test_translation(golden, caplog):
-    code, mnemonics = translate.translator.translate(golden["source"])
+def test_translation(golden):
+    code, _ = translate.translator.translate(golden["source"])
     assert code == golden.out["code"]

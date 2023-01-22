@@ -53,4 +53,4 @@ class Instruction:
 
     def __repr__(self):
         operands: list[str] = list(map(lambda it: str(it), self.operands))
-        return 'opcode={} operands_type={} operands={}'.format(self.opcode.name, self.operands_type.name, operands)
+        return "opcode={} operands_type={} operands={}".format(self.opcode.name, self.operands_type.name, operands)

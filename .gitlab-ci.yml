@@ -8,5 +8,4 @@ lab3-example:
     - python3-coverage run -m pytest --verbose
     - find . -type f -name "*.py" | xargs -t python3-coverage report
     - find . -type f -name "*.py" | xargs -t pep8 --ignore=E501
-    - find . -type f -name "*.py" | xargs -t pylint --disable C0115,C0301,R0903,W0613,W0108,W0621,W0614,C0114,R0902,R0912,W4901,W0401,C0209,R0915,W0402,R0201
-
+    - find . -type f -name "*.py" | xargs -t pylint --disable C0301,C0115,C0116,R0903,W0108,R1720,C0103
