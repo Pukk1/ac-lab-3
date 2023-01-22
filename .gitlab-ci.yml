@@ -4,7 +4,7 @@ lab3-example:
     name: python-tools
     entrypoint: [""]
   script:
-    - apt update && apt install -y pytest-golden
+    - pip install pytest-golden
     - python3-coverage run -m pytest --verbose
     - find . -type f -name "*.py" | xargs -t python3-coverage report
     - find . -type f -name "*.py" | xargs -t pep8 --ignore=E501
