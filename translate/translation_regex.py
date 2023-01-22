@@ -9,7 +9,8 @@ OPCODE_OPERAND_TYPE_VIEW: dict = {
     OpcodeOperandsType.REG_REG: r'^reg[0-4]\s*,\s*reg[0-4]$',
     OpcodeOperandsType.REG_CONST: r'^reg[0-4]\s*,\s*-?[0-9]+$',
     OpcodeOperandsType.REG_REG_REG: r'^reg[0-4]\s*,\s*reg[0-4]\s*,\s*reg[0-4]$',
-    OpcodeOperandsType.REG_REG_CONST: r'^reg[0-4]\s*,\s*reg[0-4]\s*,\s*-?[0-9]+$'
+    OpcodeOperandsType.REG_REG_CONST: r'^reg[0-4]\s*,\s*reg[0-4]\s*,\s*-?[0-9]+$',
+    # OpcodeOperandsType.REG_CONST_REG: r'^reg[0-4]\s*,\s*-?[0-9]+\s*,\s*reg[0-4]$'
 }
 
 

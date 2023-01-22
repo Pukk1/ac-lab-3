@@ -14,7 +14,7 @@ from bin_parsing.bin_ser import create_init_bin_data, create_bin_instructions
 from isa import Opcode, Instruction, OpcodeOperandsType, OpcodeInfo
 from translate.translation_regex import is_section_instr, get_section_name, is_label_instr, is_comment_instr, \
     is_comment_or_label, get_opcode_regex, OPCODE_OPERAND_TYPE_VIEW
-from utils import number_to_bin, write_list_to_file
+from utils import number_to_bin, write_list_to_file, write_code_to_file, write_code_with_mnemonics
 
 
 def get_opcode(line: str) -> Optional[Opcode]:
@@ -139,6 +139,11 @@ def create_instructions(code_lines: list[str], labels: dict[str, LabelAddress]) 
             args: list[str] = get_args_list(line, opcode)
             args: list[str] = change_label_to_address(args, labels, bin_lines_counter)
             args_type = get_opcode_arg_type(args, opcode)
+
+            # if args_type is OpcodeOperandsType.REG_CONST_REG:
+            #     args_type = OpcodeOperandsType.REG_REG_CONST
+            #     args[1], args[2] = args[2], args[1]
+
             args: list[str] = change_reg_name_to_number(args)
 
             args: list[int] = list(map(lambda arg: int(arg), args))
@@ -150,18 +155,22 @@ def create_instructions(code_lines: list[str], labels: dict[str, LabelAddress]) 
     return instructions
 
 
-def translate(program_text: str):
+def translate(program_text: str) -> tuple[list[str], list[str]]:
     lines: list[str] = create_code_lines_list(program_text)
     labels: dict[str, LabelAddress] = create_labels_lists(lines)
 
-    bin_data = create_init_bin_data(lines)
+    bin_data, data_mnemonics = create_init_bin_data(lines)
     # указатель на то, сколько строк инициализируют память данных
     code: list[str] = [number_to_bin(len(bin_data), 32)]
+    mnemonics: list[str] = [str(len(bin_data)) + ' - init num']
     code.extend(bin_data)
+    mnemonics.extend(data_mnemonics)
     instructions: list[Instruction] = create_instructions(lines, labels)
-    bin_instructions: list[str] = create_bin_instructions(instructions)
+    bin_instructions, mnemonics_instructions = create_bin_instructions(instructions)
+    mnemonics_instructions = list(map(lambda instr: str(instr), instructions))
     code.extend(bin_instructions)
-    return code
+    mnemonics.extend(mnemonics_instructions)
+    return code, mnemonics
 
 
 def main(args: list):
@@ -171,9 +180,10 @@ def main(args: list):
     with open(source, "rt", encoding="utf-8") as f:
         source = f.read()
 
-    code = translate(source)
+    code, mnemonics = translate(source)
     print("source LoC:", len(source.split()), "code instr:", len(code))
-    write_list_to_file(target, code)
+    write_code_to_file(target, code)
+    write_code_with_mnemonics(target, code, mnemonics)
 
 
 if __name__ == '__main__':

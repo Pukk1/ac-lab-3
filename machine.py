@@ -13,7 +13,7 @@ from bin_parsing.bin_deser import deserialize_bin
 from constants.error_msg import \
     NEGATIVE_SIZE_ERR, TOO_LONG_EXEC
 from isa import Instruction, OpcodeOperandsType, Opcode
-from utils import read_list_from_file, read_char_list_from_file
+from utils import read_bin_code_from_file, read_char_list_from_file
 
 
 class Alu:
@@ -48,7 +48,7 @@ class RegFile:
     def __init__(self):
         self.op1: int = 0
         self.op2: int = 0
-        self._valued_regs: dict = {1: 0, 2: 0, 3: 0, 4: 0}
+        self._valued_regs: dict[int, int] = {1: 0, 2: 0, 3: 0, 4: 0}
 
     def choice_ops(self, op1_reg_num: int, op2_reg_num: int):
         if op1_reg_num == 0:
@@ -65,6 +65,9 @@ class RegFile:
     def set_reg_value(self, reg_num: int, value: int):
         if reg_num != 0:
             self._valued_regs[reg_num] = value
+
+    def get_all_regs(self) -> dict[int, int]:
+        return self._valued_regs
 
 
 class DataMem:
@@ -85,7 +88,7 @@ class DataPath:
         self.alu: Alu = Alu()
         self.reg_file: RegFile = RegFile()
 
-    def latch_res(self, res_reg_num: int, sig_input: bool, sig_read_data: bool, sig_output: bool):
+    def latch_res(self, res_reg_num: int, sig_input: bool, sig_read_data: bool):
         if sig_input:
             try:
                 data = int(self._input_buffer.pop(0))
@@ -96,8 +99,6 @@ class DataPath:
                 data = self.data_mem.res
             else:
                 data = self.alu.res
-            if sig_output:
-                self._output_buffer.append(data)
         self.reg_file.set_reg_value(res_reg_num, data)
 
     def mem_read(self):
@@ -106,11 +107,9 @@ class DataPath:
     def mem_write(self):
         self.data_mem.mem[self.alu.res] = self.reg_file.op2
 
-    def output_write(self, sig_read_data: bool, sig_output: bool = True):
-        if sig_read_data and sig_output:
-            self._output_buffer.append(self.data_mem.res)
-        if not sig_read_data and sig_output:
-            self._output_buffer.append(self.alu.res)
+    def output_write(self, sig_output: bool = True):
+        if sig_output:
+            self._output_buffer.append(self.reg_file.op2)
 
     def get_output_buffer(self) -> list[int]:
         return self._output_buffer
@@ -180,20 +179,18 @@ class ControlUnit:
         self.tick()
         self.data_path.mem_read()
         self.tick()
-        self.data_path.latch_res(reg_num, sig_input=False, sig_read_data=True, sig_output=False)
+        self.data_path.latch_res(reg_num, sig_input=False, sig_read_data=True)
         self.latch_program_counter(sig_next=True)
         self.tick()
 
     def exec_print(self, reg_num: int):
-        self.data_path.reg_file.choice_ops(reg_num, 0)
-        self.latch_alu(sig_const=False, opcode=Opcode.ADD)
-        self.tick()
-        self.data_path.output_write(sig_read_data=False, sig_output=True)
+        self.data_path.reg_file.choice_ops(0, reg_num)
+        self.data_path.output_write(sig_output=True)
         self.latch_program_counter(sig_next=True)
         self.tick()
 
     def exec_read(self, reg_num: int):
-        self.data_path.latch_res(reg_num, sig_input=True, sig_read_data=False, sig_output=False)
+        self.data_path.latch_res(reg_num, sig_input=True, sig_read_data=False)
         self.latch_program_counter(sig_next=True)
         self.tick()
 
@@ -203,7 +200,7 @@ class ControlUnit:
         self.data_path.reg_file.choice_ops(arg_reg_num, 0)
         self.latch_alu(sig_const=True, opcode=opcode)
         self.tick()
-        self.data_path.latch_res(res_reg_num, sig_input=False, sig_read_data=False, sig_output=False)
+        self.data_path.latch_res(res_reg_num, sig_input=False, sig_read_data=False)
         self.latch_program_counter(sig_next=True)
         self.tick()
 
@@ -211,7 +208,7 @@ class ControlUnit:
         self.data_path.reg_file.choice_ops(first_arg_reg_num, second_arg_reg_num)
         self.latch_alu(sig_const=False, opcode=opcode)
         self.tick()
-        self.data_path.latch_res(res_reg_num, sig_input=False, sig_read_data=False, sig_output=False)
+        self.data_path.latch_res(res_reg_num, sig_input=False, sig_read_data=False)
         self.latch_program_counter(sig_next=True)
         self.tick()
 
@@ -258,24 +255,24 @@ class ControlUnit:
                 second_arg_reg_num: int = instruction.operands[2]
                 self.exec_alu_instr_with(opcode, res_reg_num, first_arg_reg_num, second_arg_reg_num)
 
-    # def __repr__(self):
-    #     state = "{{TICK: {}, PC: {}, ADDR: {}, OUT: {}, ACC: {}}}".format(
-    #         self.tick_counter,
-    #         self.program_counter,
-    #         self.data_path.data_address,
-    #         self.data_path.data_mem[self.data_path.data_address],
-    #         self.data_path.acc,
-    #     )
-    #
-    #     instr = self.program[self.program_counter]
-    #     opcode = instr["opcode"]
-    #     args = []
-    #     for i in range(2):
-    #         if instr["operands"][i] != OperandType.NONE:
-    #             args.append(self.program[self.program_counter + i + 1])
-    #     action = "{} {}".format(Opcode(opcode).name, str(args))
-    #
-    #     return "{} {}".format(action, state)
+    def __repr__(self):
+        state = "{{TICK: {}, PC: {}, ALU_RES: {}, REG1: {}, REG2: {}, REG3: {}, REG4: {}}}".format(
+            self.tick_counter,
+            self.program_counter,
+            self.data_path.alu.res,
+            self.data_path.reg_file.get_all_regs()[1],
+            self.data_path.reg_file.get_all_regs()[2],
+            self.data_path.reg_file.get_all_regs()[3],
+            self.data_path.reg_file.get_all_regs()[4]
+        )
+
+        instr = self.instructions[self.program_counter]
+        opcode = instr.opcode
+        args_type: OpcodeOperandsType = instr.operands_type
+        args = instr.operands
+        action = "{} {} {}".format(opcode.name, args_type.name, str(args))
+
+        return "{} {}".format(action, state)
 
 
 def simulation(init_data: list[int], instructions: list[Instruction],
@@ -285,12 +282,11 @@ def simulation(init_data: list[int], instructions: list[Instruction],
     instr_counter = 0
 
     try:
-        # logging.debug('%s', control_unit)
         while True:
             assert limit > instr_counter, TOO_LONG_EXEC
+            logging.debug('%s', control_unit)
             control_unit.execute_instruction()
             instr_counter += 1
-            # logging.debug('%s', control_unit)
     except EOFError:
         logging.warning('Input buffer is empty!')
     except StopIteration:
@@ -312,7 +308,7 @@ def main(args):
     assert len(args) == 2, "Wrong arguments: machine.py <code_file> <input_file>"
     code_file, input_file = args
 
-    bin_lines: list[str] = read_list_from_file(code_file)
+    bin_lines: list[str] = read_bin_code_from_file(code_file, 32)
 
     init_data, instructions = deserialize_bin(bin_lines)
 

@@ -20,6 +20,7 @@ class OpcodeOperandsType(int, Enum):
     # TODO
     REG_REG = 0b101
     REG = 0b110
+    # REG_CONST_REG = 0b111
 
 
 class OpcodeInfo:
@@ -49,3 +50,7 @@ class Instruction:
         self.opcode: Opcode = opcode
         self.operands_type: OpcodeOperandsType = operands_type
         self.operands: list[int] = operands
+
+    def __repr__(self):
+        operands: list[str] = list(map(lambda it: str(it), self.operands))
+        return 'opcode={} operands_type={} operands={}'.format(self.opcode.name, self.operands_type.name, operands)

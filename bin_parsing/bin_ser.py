@@ -4,8 +4,9 @@ from translate.translation_regex import is_section_instr, get_section_name, is_c
 from utils import number_to_bin
 
 
-def create_init_bin_data(code_lines: list[str]) -> list[str]:
+def create_init_bin_data(code_lines: list[str]) -> tuple[list[str], list[str]]:
     bin_data: list[str] = []
+    data_mnemonics: list[str] = []
     current_section: str = ''
     for line in code_lines:
         if is_section_instr(line):
@@ -22,19 +23,20 @@ def create_init_bin_data(code_lines: list[str]) -> list[str]:
                     'Value=' + str(value) + ' not in interval: ' + str(-pow(2, 31)) + '..' + str(pow(2, 31))
 
                 bin_data.append(number_to_bin(value, 32))
+                data_mnemonics.append(str(value))
 
-    return bin_data
+    return bin_data, data_mnemonics
 
 
-def create_bin_instructions(instructions: list[Instruction]) -> list[str]:
+def create_bin_instructions(instructions: list[Instruction]) -> tuple[list[str], list[Instruction]]:
     bin_instructions: list[str] = []
     for instruction in instructions:
         bin_instruction = number_to_bin(instruction.opcode.value.code, 4)
         bin_instruction = '0' + bin_instruction  # для упрощения у команд была убрана их специфика
         bin_instruction = number_to_bin(instruction.operands_type.value, 3) + bin_instruction
-        bin_instruction = bin_args_by_type(instruction.operands, instruction.operands_type) + bin_instruction
+        bin_instruction = bin_args_by_type(instruction.operands.copy(), instruction.operands_type) + bin_instruction
         bin_instructions.append(bin_instruction)
-    return bin_instructions
+    return bin_instructions, instructions
 
 
 def bin_args_by_type(args: list[int], op_type: OpcodeOperandsType) -> str:
