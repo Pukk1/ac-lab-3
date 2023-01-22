@@ -140,10 +140,8 @@ class ControlUnit:
 
     def exec_jmp(self, offset: int):
         self.const = self.program_counter + offset
-        self.tick()
         self.data_path.reg_file.choice_ops(0, 0)
         self.latch_alu(True, Opcode.ADD)
-        self.tick()
         self.latch_program_counter(sig_next=False)
         self.tick()
 
@@ -152,29 +150,27 @@ class ControlUnit:
             self.exec_jmp(offset)
         else:
             self.latch_program_counter(sig_next=True)
+            self.tick()
 
     def exec_bne(self, offset: int):
         if not self.data_path.alu.zero:
             self.exec_jmp(offset)
         else:
             self.latch_program_counter(sig_next=True)
+            self.tick()
 
     def exec_st(self, reg_num: int, data_mem_address: int):
         self.const = data_mem_address
-        self.tick()
         self.data_path.reg_file.choice_ops(0, reg_num)
         self.latch_alu(sig_const=True, opcode=Opcode.ADD)
-        self.tick()
         self.data_path.mem_write()
         self.latch_program_counter(sig_next=True)
         self.tick()
 
     def exec_ld(self, reg_num: int, data_mem_address: int):
         self.const = data_mem_address
-        self.tick()
         self.data_path.reg_file.choice_ops(0, 0)
         self.latch_alu(sig_const=True, opcode=Opcode.ADD)
-        self.tick()
         self.data_path.mem_read()
         self.tick()
         self.data_path.latch_res(reg_num, sig_input=False, sig_read_data=True)
@@ -194,10 +190,8 @@ class ControlUnit:
 
     def exec_alu_instr_with_const(self, opcode: Opcode, res_reg_num: int, arg_reg_num: int, const_arg: int):
         self.const = const_arg
-        self.tick()
         self.data_path.reg_file.choice_ops(arg_reg_num, 0)
         self.latch_alu(sig_const=True, opcode=opcode)
-        self.tick()
         self.data_path.latch_res(res_reg_num, sig_input=False, sig_read_data=False)
         self.latch_program_counter(sig_next=True)
         self.tick()
@@ -205,7 +199,6 @@ class ControlUnit:
     def exec_alu_instr_with(self, opcode: Opcode, res_reg_num: int, first_arg_reg_num: int, second_arg_reg_num: int):
         self.data_path.reg_file.choice_ops(first_arg_reg_num, second_arg_reg_num)
         self.latch_alu(sig_const=False, opcode=opcode)
-        self.tick()
         self.data_path.latch_res(res_reg_num, sig_input=False, sig_read_data=False)
         self.latch_program_counter(sig_next=True)
         self.tick()

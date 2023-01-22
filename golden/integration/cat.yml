@@ -15,17 +15,17 @@ output: |
   source LoC: 13 code instr: 5
   ============================================================
   asd
-  instr_counter:  9 ticks: 15
+  instr_counter:  9 ticks: 9
 log: |
-  DEBUG    root:machine.py:287 READ REG [1] {TICK: 0, PC: 0, ALU_RES: 0, REG1: 0, REG2: 0, REG3: 0, REG4: 0}
-  DEBUG    root:machine.py:287 PRINT REG [1] {TICK: 1, PC: 1, ALU_RES: 0, REG1: 97, REG2: 0, REG3: 0, REG4: 0}
-  DEBUG    root:machine.py:287 JMP CONST [-2] {TICK: 2, PC: 2, ALU_RES: 0, REG1: 97, REG2: 0, REG3: 0, REG4: 0}
-  DEBUG    root:machine.py:287 READ REG [1] {TICK: 5, PC: 0, ALU_RES: 0, REG1: 97, REG2: 0, REG3: 0, REG4: 0}
-  DEBUG    root:machine.py:287 PRINT REG [1] {TICK: 6, PC: 1, ALU_RES: 0, REG1: 115, REG2: 0, REG3: 0, REG4: 0}
-  DEBUG    root:machine.py:287 JMP CONST [-2] {TICK: 7, PC: 2, ALU_RES: 0, REG1: 115, REG2: 0, REG3: 0, REG4: 0}
-  DEBUG    root:machine.py:287 READ REG [1] {TICK: 10, PC: 0, ALU_RES: 0, REG1: 115, REG2: 0, REG3: 0, REG4: 0}
-  DEBUG    root:machine.py:287 PRINT REG [1] {TICK: 11, PC: 1, ALU_RES: 0, REG1: 100, REG2: 0, REG3: 0, REG4: 0}
-  DEBUG    root:machine.py:287 JMP CONST [-2] {TICK: 12, PC: 2, ALU_RES: 0, REG1: 100, REG2: 0, REG3: 0, REG4: 0}
-  DEBUG    root:machine.py:287 READ REG [1] {TICK: 15, PC: 0, ALU_RES: 0, REG1: 100, REG2: 0, REG3: 0, REG4: 0}
-  WARNING  root:machine.py:291 Input buffer is empty!
-  INFO     root:machine.py:303 output_buffer: asd
+  DEBUG    root:machine.py:278 READ REG [1] {TICK: 0, PC: 0, ALU_RES: 0, REG1: 0, REG2: 0, REG3: 0, REG4: 0}
+  DEBUG    root:machine.py:278 PRINT REG [1] {TICK: 1, PC: 1, ALU_RES: 0, REG1: 97, REG2: 0, REG3: 0, REG4: 0}
+  DEBUG    root:machine.py:278 JMP CONST [-2] {TICK: 2, PC: 2, ALU_RES: 0, REG1: 97, REG2: 0, REG3: 0, REG4: 0}
+  DEBUG    root:machine.py:278 READ REG [1] {TICK: 3, PC: 0, ALU_RES: 0, REG1: 97, REG2: 0, REG3: 0, REG4: 0}
+  DEBUG    root:machine.py:278 PRINT REG [1] {TICK: 4, PC: 1, ALU_RES: 0, REG1: 115, REG2: 0, REG3: 0, REG4: 0}
+  DEBUG    root:machine.py:278 JMP CONST [-2] {TICK: 5, PC: 2, ALU_RES: 0, REG1: 115, REG2: 0, REG3: 0, REG4: 0}
+  DEBUG    root:machine.py:278 READ REG [1] {TICK: 6, PC: 0, ALU_RES: 0, REG1: 115, REG2: 0, REG3: 0, REG4: 0}
+  DEBUG    root:machine.py:278 PRINT REG [1] {TICK: 7, PC: 1, ALU_RES: 0, REG1: 100, REG2: 0, REG3: 0, REG4: 0}
+  DEBUG    root:machine.py:278 JMP CONST [-2] {TICK: 8, PC: 2, ALU_RES: 0, REG1: 100, REG2: 0, REG3: 0, REG4: 0}
+  DEBUG    root:machine.py:278 READ REG [1] {TICK: 9, PC: 0, ALU_RES: 0, REG1: 100, REG2: 0, REG3: 0, REG4: 0}
+  WARNING  root:machine.py:282 Input buffer is empty!
+  INFO     root:machine.py:294 output_buffer: asd
