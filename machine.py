@@ -10,8 +10,6 @@ import logging
 import sys
 
 from bin_parsing.bin_deser import deserialize_bin
-from constants.error_msg import \
-    NEGATIVE_SIZE_ERR, TOO_LONG_EXEC
 from isa import Instruction, OpcodeOperandsType, Opcode
 from utils import read_bin_code_from_file, read_char_list_from_file
 
@@ -72,7 +70,7 @@ class RegFile:
 
 class DataMem:
     def __init__(self, data_memory_size: int, init_data: list[int]):
-        assert data_memory_size > 0, NEGATIVE_SIZE_ERR
+        assert data_memory_size > 0, "Data_memory size should be non-zero"
         self.mem: list[int] = [0] * data_memory_size
         self.res: int = 0
 
@@ -283,7 +281,7 @@ def simulation(init_data: list[int], instructions: list[Instruction],
 
     try:
         while True:
-            assert limit > instr_counter, TOO_LONG_EXEC
+            assert limit > instr_counter, "Too long execution, increase limit!"
             logging.debug('%s', control_unit)
             control_unit.execute_instruction()
             instr_counter += 1

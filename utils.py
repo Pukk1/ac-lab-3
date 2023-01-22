@@ -1,6 +1,3 @@
-from constants.error_msg import ILLEGAL_BIN_NUMBER
-
-
 def number_to_bin(value: int, word_length: int) -> str:
     # операции по получению бинарного представления числа =====
     if value < 0:
@@ -62,7 +59,7 @@ def read_bin_code_from_file(filename: str, word_size: int) -> list[str]:
         file_text = file_text.strip()
         # lines = file_text.split('\n')
         if len(file_text) % word_size != 0:
-            assert False, ILLEGAL_BIN_NUMBER.format(len(file_text))
+            assert False, "ILLEGAL BIN NUMBER = {}".format(len(file_text))
         for _ in range(0, int(len(file_text) / word_size)):
             lines.append(file_text[:word_size])
             file_text = file_text[word_size:]
