@@ -49,6 +49,7 @@ def test_whole_by_golden(golden, caplog):
         source = os.path.join(tmpdirname, "source.bf")
         input_stream = os.path.join(tmpdirname, "input.txt")
         target = os.path.join(tmpdirname, "target.o")
+        target_mnem = os.path.join(tmpdirname, "target_with_mnemonics.mnemonics")
 
         # Записываем входные данные в файлы. Данные берутся из теста.
         with open(source, "w", encoding="utf-8") as file:
@@ -67,7 +68,11 @@ def test_whole_by_golden(golden, caplog):
         with open(target, encoding="utf-8") as file:
             code = file.read()
 
+        with open(target_mnem, encoding="utf-8") as file:
+            mnem_code = file.read()
+
         # Проверяем что ожидания соответствуют реальности.
         assert code == golden.out["code"]
+        assert mnem_code == golden.out["code_with_mnem"]
         assert stdout.getvalue() == golden.out["output"]
         assert caplog.text == golden.out["log"]
