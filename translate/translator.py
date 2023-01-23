@@ -3,8 +3,7 @@
 # pylint: disable=invalid-name                # сохраним традиционные наименования сигналов
 # pylint: disable=consider-using-f-string     # избыточный синтаксис
 
-"""Транслятор brainfuck в машинный код
-"""
+"""Транслятор asm в машинный код"""
 
 import re
 import sys
@@ -17,7 +16,16 @@ from translate.translation_regex import is_section_instr, get_section_name, is_l
 from utils import number_to_bin, write_code_to_file, write_code_with_mnemonics
 
 
+class LabelAddress:
+    """вспомогательная структура для хранения меток в коде в структурном виде"""
+
+    def __init__(self, section: str, instr_line: int):
+        self.section: str = section
+        self.instr_line: int = instr_line
+
+
 def get_opcode(line: str) -> Optional[Opcode]:
+    """получить код операции для строки"""
     for opcode in Opcode:
         opcode: Opcode
         if re.match(get_opcode_regex(opcode), line) is not None:
@@ -26,6 +34,7 @@ def get_opcode(line: str) -> Optional[Opcode]:
 
 
 def get_args_sub_str(line: str, opcode: Opcode) -> str:
+    """получить подстроку набора аргументов из строки с инструкцией"""
     args = re.split(get_opcode_regex(opcode), line)[1]
     args = args.strip()
     return args
@@ -42,18 +51,13 @@ def get_args_list(line: str, opcode: Opcode) -> list[str]:
 
 
 def get_opcode_arg_type(args: list[str], opcode: Opcode, line_number: int) -> OpcodeOperandsType:
+    """получить тип набора аргументов для представленных для инструкции"""
     args_sub_str = ', '.join(args)
     opcode_info: OpcodeInfo = opcode.value
     for operand_type in opcode_info.available_types:
         if re.match(OPCODE_OPERAND_TYPE_VIEW[operand_type], args_sub_str) is not None:
             return operand_type
     assert False, 'Operands type not found for args substring: ' + args_sub_str + ' line_number=' + str(line_number)
-
-
-class LabelAddress:
-    def __init__(self, section: str, instr_line: int):
-        self.section: str = section
-        self.instr_line: int = instr_line
 
 
 def create_code_lines_list(program_text: str) -> list[str]:
@@ -64,6 +68,7 @@ def create_code_lines_list(program_text: str) -> list[str]:
 
 
 def create_labels_lists(lines: list[str]) -> dict[str, LabelAddress]:
+    """создать общий список всех меток в программе"""
     available_sections: list[str] = ['data', 'text']
 
     labels: dict[str, LabelAddress] = {}
@@ -98,6 +103,10 @@ def create_labels_lists(lines: list[str]) -> dict[str, LabelAddress]:
 
 
 def change_label_to_address(args: list[str], labels: dict[str, LabelAddress], bin_lines_counter: int) -> list[str]:
+    """заменить метки на адреса:
+    + для меток из section .data - адреса абсолютные тк гарвардская архитектура не позволяет сделать относительные
+    + для меток из section .text - относительные адреса (команды ветвления)
+    """
     addressed_args: list[str] = []
     for arg in args:
         if not arg.isdigit() and arg in labels:
@@ -110,18 +119,23 @@ def change_label_to_address(args: list[str], labels: dict[str, LabelAddress], bi
     return addressed_args
 
 
-def change_reg_name_to_number(args: list[str]) -> list[str]:
-    result_list: list[str] = []
+def change_regs_name_to_number(args: list[str]) -> list[int]:
+    """замена названий регистров их порядковым номером"""
+    result_list: list[int] = []
     for arg in args:
+        reg_num: int
         if re.match(r'^reg[0-4]$', arg):
-            result_list.append(re.split(r'reg', arg)[1])
+            reg_num = int(re.split(r'reg', arg)[1])
         else:
-            result_list.append(arg)
+            reg_num = int(arg)
+        result_list.append(reg_num)
     return result_list
 
 
-# создание листа Instruction-ов на основе исходного кода
 def create_instructions(code_lines: list[str], labels: dict[str, LabelAddress]) -> list[Instruction]:
+    """создание списка структур Instruction на основе исходного кода,
+     для более удобного структурного представления программы
+     """
     current_section: str = ''
     bin_lines_counter: int = 0
     instructions: list[Instruction] = []
@@ -146,9 +160,7 @@ def create_instructions(code_lines: list[str], labels: dict[str, LabelAddress]) 
             #     args_type = OpcodeOperandsType.REG_REG_CONST
             #     args[1], args[2] = args[2], args[1]
 
-            args: list[str] = change_reg_name_to_number(args)
-
-            args: list[int] = list(map(lambda arg: int(arg), args))
+            args: list[int] = change_regs_name_to_number(args)
 
             instructions.append(Instruction(opcode, args_type, args))
 
@@ -158,6 +170,8 @@ def create_instructions(code_lines: list[str], labels: dict[str, LabelAddress]) 
 
 
 def translate(program_text: str) -> tuple[list[str], list[str]]:
+    """трансляция программы в список машинных слов, соответствующих командам
+    + для более удобного чтения список мнемоник бинарных команд"""
     lines: list[str] = create_code_lines_list(program_text)
     labels: dict[str, LabelAddress] = create_labels_lists(lines)
 

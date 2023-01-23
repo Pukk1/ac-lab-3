@@ -10,12 +10,14 @@ import logging
 import sys
 from typing import Optional
 
-from bin_parsing.bin_deser import deserialize_bin
+from bin_parsing.bin_deser import deserialize_bin_lines_list
 from isa import Instruction, OpcodeOperandsType, Opcode
 from utils import read_bin_code_from_file, read_char_list_from_file
 
 
 class Alu:
+    """структурное представление физического АЛУ"""
+
     def __init__(self):
         self.op2: int = 0
         self.op1: int = 0
@@ -30,6 +32,8 @@ class Alu:
         }
 
     def execute(self, opcode: Opcode):
+        """выполнение выбранной арифметической операции с использованием op1 и op2,
+        результат записывается в res (физически передаётся на шину результата АЛУ)"""
         self.res = self.operations[opcode](self.op1, self.op2)
 
         while self.res > pow(2, 31) - 1:
@@ -44,6 +48,10 @@ class Alu:
 
 
 class RegFile:
+    """структурное представление физического регистрового файла.
+    Внутри _valued_regs не хранится нулевой регистр,
+    его логика раборы расписана отдельно в методах choice_ops и set_reg_value тк он константно равен нулю"""
+
     def __init__(self):
         self.op1: int = 0
         self.op2: int = 0
@@ -70,6 +78,8 @@ class RegFile:
 
 
 class DataMem:
+    """структурное представление физической памяти данных"""
+
     def __init__(self, data_memory_size: int, init_data: list[int]):
         assert data_memory_size > 0, "Data_memory size should be non-zero"
         self.mem: list[int] = [0] * data_memory_size
@@ -80,6 +90,9 @@ class DataMem:
 
 
 class DataPath:
+    """структурное представление физического модуля процессора DataPath.
+    Содержит методы для работы между устройствами находящимися внутри модуля: Alu, DataMem, RegFile"""
+
     def __init__(self, data_memory_size: int, init_data: list[int], input_buffer: list[int]):
         self._input_buffer: list[int] = input_buffer
         self._output_buffer: list[int] = []
@@ -115,6 +128,13 @@ class DataPath:
 
 
 class ControlUnit:
+    """структурное представление физического модуля ControlUnit.
+    Содержит методы для работы между устройствами находящимися внутри модуля: PC, DataPath,
+    const (константное значение подаваемое из control unit на алу).
+    Устанавливает взаимодействие между памятью инструкций и памятью данных (Гарвардская архитектура).
+    Посылает сигналы для работы устройств, входящих в модуль,
+    а так же мультиплексоров, обеспечивающих их взаимодействие"""
+
     def __init__(self, instructions: list[Instruction], data_path: DataPath):
         self.tick_counter: int = 0
         self.instructions: list[Instruction] = instructions
@@ -131,7 +151,8 @@ class ControlUnit:
         else:
             self.program_counter = self.data_path.alu.res
 
-    def latch_alu(self, sig_const: bool, opcode: Opcode) -> None:
+    def latch_exec_alu(self, sig_const: bool, opcode: Opcode) -> None:
+        """выполнение операции на АЛУ и подача результата операции на шину результата"""
         self.data_path.alu.op1 = self.data_path.reg_file.op1
         if sig_const:
             self.data_path.alu.op2 = self.const
@@ -139,10 +160,12 @@ class ControlUnit:
             self.data_path.alu.op2 = self.data_path.reg_file.op2
         self.data_path.alu.execute(opcode)
 
+    # ======================================================================================================================
+    # выполнение операций в виде отдельных функций, с расчетом затрачиваемого количества тактов процессора =================
     def exec_jmp(self, offset: int):
         self.const = self.program_counter + offset
         self.data_path.reg_file.choice_ops(0, 0)
-        self.latch_alu(True, Opcode.ADD)
+        self.latch_exec_alu(True, Opcode.ADD)
         self.latch_program_counter(sig_next=False)
         self.tick()
 
@@ -163,7 +186,7 @@ class ControlUnit:
     def exec_st(self, reg_num: int, data_mem_address: int):
         self.const = data_mem_address
         self.data_path.reg_file.choice_ops(0, reg_num)
-        self.latch_alu(sig_const=True, opcode=Opcode.ADD)
+        self.latch_exec_alu(sig_const=True, opcode=Opcode.ADD)
         self.data_path.mem_write()
         self.latch_program_counter(sig_next=True)
         self.tick()
@@ -171,7 +194,7 @@ class ControlUnit:
     def exec_ld(self, reg_num: int, data_mem_address: int):
         self.const = data_mem_address
         self.data_path.reg_file.choice_ops(0, 0)
-        self.latch_alu(sig_const=True, opcode=Opcode.ADD)
+        self.latch_exec_alu(sig_const=True, opcode=Opcode.ADD)
         self.data_path.mem_read()
         self.tick()
         self.data_path.latch_res(reg_num, sig_input=False, sig_read_data=True)
@@ -192,7 +215,7 @@ class ControlUnit:
     def exec_alu_instr_with_const(self, opcode: Opcode, res_reg_num: int, arg_reg_num: int, const_arg: int):
         self.const = const_arg
         self.data_path.reg_file.choice_ops(arg_reg_num, 0)
-        self.latch_alu(sig_const=True, opcode=opcode)
+        self.latch_exec_alu(sig_const=True, opcode=opcode)
         self.data_path.latch_res(res_reg_num, sig_input=False, sig_read_data=False)
         self.latch_program_counter(sig_next=True)
         self.tick()
@@ -200,17 +223,21 @@ class ControlUnit:
     def exec_alu_instr_with_reg(self, opcode: Opcode, res_reg_num: int, first_arg_reg_num: int,
                                 second_arg_reg_num: int):
         self.data_path.reg_file.choice_ops(first_arg_reg_num, second_arg_reg_num)
-        self.latch_alu(sig_const=False, opcode=opcode)
+        self.latch_exec_alu(sig_const=False, opcode=opcode)
         self.data_path.latch_res(res_reg_num, sig_input=False, sig_read_data=False)
         self.latch_program_counter(sig_next=True)
         self.tick()
 
+    # ======================================================================================================================
+
     def execute_instruction(self):
+        """функция для последовательного выполнения инструкций из instr_mem"""
         instruction: Instruction = self.instructions[self.program_counter]
         opcode: Opcode = instruction.opcode
 
         if opcode is Opcode.HLT:
             raise StopIteration()
+
         if opcode is Opcode.JMP:
             offset: int = instruction.operands[0]
             self.exec_jmp(offset)
@@ -252,7 +279,6 @@ class ControlUnit:
         alu_data_mem: Optional[int] = None
         if 0 <= self.data_path.alu.res < len(self.data_path.data_mem.mem):
             alu_data_mem = self.data_path.data_mem.mem[self.data_path.alu.res]
-            alu_data_mem = self.data_path.data_mem.mem[self.data_path.alu.res]
 
         state = "{{TICK: {}, PC: {}, ALU_RES: {}, DATA_MEM[ALU_RES]: {}, REG1: {}, REG2: {}, REG3: {}, REG4: {}}}".format(
             self.tick_counter,
@@ -274,8 +300,20 @@ class ControlUnit:
         return "{} {}".format(action, state)
 
 
+def get_output_line(output_buff: list[int], print_char: bool) -> str:
+    output: str = ''
+    for it in output_buff:
+        if print_char and 0 <= it < 256:
+            output += chr(it)
+        else:
+            output += str(it)
+    return output
+
+
 def simulation(init_data: list[int], instructions: list[Instruction],
                input_tokens: list[int], data_memory_size: int, limit: int) -> tuple[str, int, int]:
+    """запуск симуляции работы процессора"""
+
     data_path = DataPath(data_memory_size, init_data, input_tokens)
     control_unit = ControlUnit(instructions, data_path)
     instr_counter = 0
@@ -291,16 +329,12 @@ def simulation(init_data: list[int], instructions: list[Instruction],
     except StopIteration:
         pass
 
-    output: str = ''
-    for it in data_path.get_output_buffer():
-        if 0 <= it < 256:
-            output += chr(it)
-        else:
-            output += '[' + str(it) + ']'
-        # output += '[' + str(it) + ']'
+    output_line: str = get_output_line(data_path.get_output_buffer(), True)
 
-    logging.info('output_buffer: %s', output)
-    return output, instr_counter, control_unit.tick_counter
+    get_output_line(data_path.get_output_buffer(), True)
+
+    logging.info('output_buffer: %s', output_line)
+    return output_line, instr_counter, control_unit.tick_counter
 
 
 def main(args):
@@ -309,7 +343,7 @@ def main(args):
 
     bin_lines: list[str] = read_bin_code_from_file(code_file, 32)
 
-    init_data, instructions = deserialize_bin(bin_lines)
+    init_data, instructions = deserialize_bin_lines_list(bin_lines)
 
     input_tokens: list[str] = read_char_list_from_file(input_file)
     input_tokens: list[int] = list(map(lambda c: ord(c), input_tokens))

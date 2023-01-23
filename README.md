@@ -223,7 +223,7 @@ opcode=SUB operands_type=REG_REG_CONST operands=['0', '1', '1000']
 
 ### Схема DataPath и ControlUnit
 
-![https://drive.google.com/file/d/1pW6bqPwg3MK0XPWS_4BTwWfULOFVa7ND/view?usp=sharing](/image.png "Схема DataPath и ControlUnit")
+![https://drive.google.com/file/d/13UWQ3JS0PwBvoOHBYT5JUBouj7UB9Ehz/view?usp=share_link](/image.png "Схема DataPath и ControlUnit")
 
 ### DataPath
 

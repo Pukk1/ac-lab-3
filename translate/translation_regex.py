@@ -1,7 +1,10 @@
+"""вспомогательный блок для работы с регулярными выражениями при трансляции"""
+
 import re
 
 from isa import Opcode, OpcodeOperandsType
 
+# регулярные выражения, соответствующие строкам набора аргументов, для определения типа набора аргументов
 OPCODE_OPERAND_TYPE_VIEW: dict = {
     OpcodeOperandsType.NONE: r'^$',
     OpcodeOperandsType.CONST: r'^-?[0-9]+$',

@@ -1,7 +1,10 @@
+"""файл со структурами предназначенными для описания команд, типов их наборов аргументов в структурном виде"""
+
 from enum import Enum
 
 
 class OpcodeOperandsType(int, Enum):
+    """тип набора аргументов инструкции"""
     # машинное слово 32 бита
     # 0-3 бит под код opcode
     # 4-й бит под специфику команды (вид адрессации например)
@@ -25,12 +28,15 @@ class OpcodeOperandsType(int, Enum):
 
 
 class OpcodeInfo:
+    """информация о типе инструкции: бинарный код, возможные наборы аргументов"""
+
     def __init__(self, code: int, available_types: list[OpcodeOperandsType]):
         self.code: int = code
         self.available_types: list[OpcodeOperandsType] = available_types
 
 
 class Opcode(Enum):
+    """возможные типы инструкций"""
     HLT = OpcodeInfo(0b0000, [OpcodeOperandsType.NONE])
     ADD = OpcodeInfo(0b0001, [OpcodeOperandsType.REG_REG_CONST, OpcodeOperandsType.REG_REG_REG])
     SUB = OpcodeInfo(0b0010, [OpcodeOperandsType.REG_REG_CONST, OpcodeOperandsType.REG_REG_REG])
@@ -47,6 +53,8 @@ class Opcode(Enum):
 
 
 class Instruction:
+    """структурное представление инструкции"""
+
     def __init__(self, opcode: Opcode, operands_type: OpcodeOperandsType, operands: list[int]):
         self.opcode: Opcode = opcode
         self.operands_type: OpcodeOperandsType = operands_type

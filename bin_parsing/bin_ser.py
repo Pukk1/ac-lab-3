@@ -1,3 +1,5 @@
+"""модуль занимается преобразованием операций из section .text и данных из section .data в набор бинарных инструкций"""
+
 from isa import Instruction, OpcodeOperandsType
 from translate.translation_regex import is_section_instr, get_section_name, is_comment_or_label, is_word_instr, \
     get_word_value
@@ -5,6 +7,7 @@ from utils import number_to_bin
 
 
 def create_init_bin_data(code_lines: list[str]) -> tuple[list[str], list[str]]:
+    """создать бинарное представление section .data"""
     bin_data: list[str] = []
     data_mnemonics: list[str] = []
     current_section: str = ''
@@ -28,18 +31,8 @@ def create_init_bin_data(code_lines: list[str]) -> tuple[list[str], list[str]]:
     return bin_data, data_mnemonics
 
 
-def create_bin_instructions(instructions: list[Instruction]) -> tuple[list[str], list[Instruction]]:
-    bin_instructions: list[str] = []
-    for instruction in instructions:
-        bin_instruction = number_to_bin(instruction.opcode.value.code, 4)
-        bin_instruction = '0' + bin_instruction  # для упрощения у команд была убрана их специфика
-        bin_instruction = number_to_bin(instruction.operands_type.value, 3) + bin_instruction
-        bin_instruction = bin_args_by_type(instruction.operands.copy(), instruction.operands_type) + bin_instruction
-        bin_instructions.append(bin_instruction)
-    return bin_instructions, instructions
-
-
 def bin_args_by_type(args: list[int], op_type: OpcodeOperandsType) -> str:
+    """преобразовать набор аргументов в бинарные вид, в соответствии с типом набора аргументов"""
     bin_args: str
     if op_type == OpcodeOperandsType.NONE:
         bin_args = number_to_bin(0, 24)
@@ -60,3 +53,15 @@ def bin_args_by_type(args: list[int], op_type: OpcodeOperandsType) -> str:
     else:
         assert False, 'Can\'t cast args: ' + str(args) + ' opcode_typed: ' + str(op_type.name)
     return bin_args
+
+
+def create_bin_instructions(instructions: list[Instruction]) -> tuple[list[str], list[Instruction]]:
+    """создать бинарное представление инструкции и набора её аргументов"""
+    bin_instructions: list[str] = []
+    for instruction in instructions:
+        bin_instruction = number_to_bin(instruction.opcode.value.code, 4)
+        bin_instruction = '0' + bin_instruction  # для упрощения у команд была убрана их специфика
+        bin_instruction = number_to_bin(instruction.operands_type.value, 3) + bin_instruction
+        bin_instruction = bin_args_by_type(instruction.operands.copy(), instruction.operands_type) + bin_instruction
+        bin_instructions.append(bin_instruction)
+    return bin_instructions, instructions
