@@ -42,17 +42,17 @@ class TranslationTest(unittest.TestCase):
         self.assertEqual(args, ['reg1', 'reg1', 'reg1'])
 
     def test_get_opcode_arg_type(self):
-        op_type = translate.translator.get_opcode_arg_type(['reg1', 'reg2', 'reg3'], Opcode.ADD)
+        op_type = translate.translator.get_opcode_arg_type(['reg1', 'reg2', 'reg3'], Opcode.ADD, 0)
         self.assertEqual(op_type, OpcodeOperandsType.REG_REG_REG)
-        op_type = translate.translator.get_opcode_arg_type(['reg1', 'reg2', '10'], Opcode.ADD)
+        op_type = translate.translator.get_opcode_arg_type(['reg1', 'reg2', '10'], Opcode.ADD, 0)
         self.assertEqual(op_type, OpcodeOperandsType.REG_REG_CONST)
-        op_type = translate.translator.get_opcode_arg_type(['reg1', '10'], Opcode.LD)
+        op_type = translate.translator.get_opcode_arg_type(['reg1', '10'], Opcode.LD, 0)
         self.assertEqual(op_type, OpcodeOperandsType.REG_CONST)
-        op_type = translate.translator.get_opcode_arg_type(['reg1'], Opcode.PRINT)
+        op_type = translate.translator.get_opcode_arg_type(['reg1'], Opcode.PRINT, 0)
         self.assertEqual(op_type, OpcodeOperandsType.REG)
-        op_type = translate.translator.get_opcode_arg_type(['10'], Opcode.JMP)
+        op_type = translate.translator.get_opcode_arg_type(['10'], Opcode.JMP, 0)
         self.assertEqual(op_type, OpcodeOperandsType.CONST)
-        op_type = translate.translator.get_opcode_arg_type([], Opcode.HLT)
+        op_type = translate.translator.get_opcode_arg_type([], Opcode.HLT, 0)
         self.assertEqual(op_type, OpcodeOperandsType.NONE)
 
 

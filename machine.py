@@ -8,6 +8,7 @@
 
 import logging
 import sys
+from typing import Optional
 
 from bin_parsing.bin_deser import deserialize_bin
 from isa import Instruction, OpcodeOperandsType, Opcode
@@ -196,7 +197,8 @@ class ControlUnit:
         self.latch_program_counter(sig_next=True)
         self.tick()
 
-    def exec_alu_instr_with_reg(self, opcode: Opcode, res_reg_num: int, first_arg_reg_num: int, second_arg_reg_num: int):
+    def exec_alu_instr_with_reg(self, opcode: Opcode, res_reg_num: int, first_arg_reg_num: int,
+                                second_arg_reg_num: int):
         self.data_path.reg_file.choice_ops(first_arg_reg_num, second_arg_reg_num)
         self.latch_alu(sig_const=False, opcode=opcode)
         self.data_path.latch_res(res_reg_num, sig_input=False, sig_read_data=False)
@@ -247,10 +249,16 @@ class ControlUnit:
                 self.exec_alu_instr_with_reg(opcode, res_reg_num, first_arg_reg_num, second_arg_reg_num)
 
     def __repr__(self):
-        state = "{{TICK: {}, PC: {}, ALU_RES: {}, REG1: {}, REG2: {}, REG3: {}, REG4: {}}}".format(
+        alu_data_mem: Optional[int] = None
+        if 0 <= self.data_path.alu.res < len(self.data_path.data_mem.mem):
+            alu_data_mem = self.data_path.data_mem.mem[self.data_path.alu.res]
+            alu_data_mem = self.data_path.data_mem.mem[self.data_path.alu.res]
+
+        state = "{{TICK: {}, PC: {}, ALU_RES: {}, DATA_MEM[ALU_RES]: {}, REG1: {}, REG2: {}, REG3: {}, REG4: {}}}".format(
             self.tick_counter,
             self.program_counter,
             self.data_path.alu.res,
+            alu_data_mem,
             self.data_path.reg_file.get_all_regs()[1],
             self.data_path.reg_file.get_all_regs()[2],
             self.data_path.reg_file.get_all_regs()[3],

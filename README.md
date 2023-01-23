@@ -287,11 +287,12 @@ opcode=SUB operands_type=REG_REG_CONST operands=['0', '1', '1000']
 
 ## Апробация
 
-В качестве интеграционных тестов реализовано 3 алгоритма:
+В качестве интеграционных тестов реализовано 4 алгоритма:
 
 1. [hello world](files/helloworld.asm).
 2. [cat](files/cat.asm) -- программа `cat`, повторяем ввод на выводе.
 3. [prob1](files/alg.asm) -- рассчитать сумму делителей 3 или 5, меньших 1000
+4. [test_st](files/test_st.asm) -- проверяет корректность работы команды st (единственная не покрытая предыдущими тестами сложная (не арифметическая) операция)
 
 Юнит-тесты реализованы тут:
 [unit_test](unit_test.py)
@@ -341,16 +342,16 @@ source LoC: 13 code instr: 5
 > cat bin.bin
 0000000000000000000000000000000000010000000000000000000011001100000100000000000000000000110010111111111111111110000000000010011000000000000000000000000000000000
 > ./machine.py files/bin.bin files/input
-DEBUG:root:READ REG [1] {TICK: 0, PC: 0, ALU_RES: 0, REG1: 0, REG2: 0, REG3: 0, REG4: 0}
-DEBUG:root:PRINT REG [1] {TICK: 1, PC: 1, ALU_RES: 0, REG1: 97, REG2: 0, REG3: 0, REG4: 0}
-DEBUG:root:JMP CONST [-2] {TICK: 2, PC: 2, ALU_RES: 0, REG1: 97, REG2: 0, REG3: 0, REG4: 0}
-DEBUG:root:READ REG [1] {TICK: 3, PC: 0, ALU_RES: 0, REG1: 97, REG2: 0, REG3: 0, REG4: 0}
-DEBUG:root:PRINT REG [1] {TICK: 4, PC: 1, ALU_RES: 0, REG1: 115, REG2: 0, REG3: 0, REG4: 0}
-DEBUG:root:JMP CONST [-2] {TICK: 5, PC: 2, ALU_RES: 0, REG1: 115, REG2: 0, REG3: 0, REG4: 0}
-DEBUG:root:READ REG [1] {TICK: 6, PC: 0, ALU_RES: 0, REG1: 115, REG2: 0, REG3: 0, REG4: 0}
-DEBUG:root:PRINT REG [1] {TICK: 7, PC: 1, ALU_RES: 0, REG1: 100, REG2: 0, REG3: 0, REG4: 0}
-DEBUG:root:JMP CONST [-2] {TICK: 8, PC: 2, ALU_RES: 0, REG1: 100, REG2: 0, REG3: 0, REG4: 0}
-DEBUG:root:READ REG [1] {TICK: 9, PC: 0, ALU_RES: 0, REG1: 100, REG2: 0, REG3: 0, REG4: 0}
+DEBUG:root:READ REG [1] {TICK: 0, PC: 0, ALU_RES: 0, DATA_MEM[ALU_RES]: 0, REG1: 0, REG2: 0, REG3: 0, REG4: 0}
+DEBUG:root:PRINT REG [1] {TICK: 1, PC: 1, ALU_RES: 0, DATA_MEM[ALU_RES]: 0, REG1: 97, REG2: 0, REG3: 0, REG4: 0}
+DEBUG:root:JMP CONST [-2] {TICK: 2, PC: 2, ALU_RES: 0, DATA_MEM[ALU_RES]: 0, REG1: 97, REG2: 0, REG3: 0, REG4: 0}
+DEBUG:root:READ REG [1] {TICK: 3, PC: 0, ALU_RES: 0, DATA_MEM[ALU_RES]: 0, REG1: 97, REG2: 0, REG3: 0, REG4: 0}
+DEBUG:root:PRINT REG [1] {TICK: 4, PC: 1, ALU_RES: 0, DATA_MEM[ALU_RES]: 0, REG1: 115, REG2: 0, REG3: 0, REG4: 0}
+DEBUG:root:JMP CONST [-2] {TICK: 5, PC: 2, ALU_RES: 0, DATA_MEM[ALU_RES]: 0, REG1: 115, REG2: 0, REG3: 0, REG4: 0}
+DEBUG:root:READ REG [1] {TICK: 6, PC: 0, ALU_RES: 0, DATA_MEM[ALU_RES]: 0, REG1: 115, REG2: 0, REG3: 0, REG4: 0}
+DEBUG:root:PRINT REG [1] {TICK: 7, PC: 1, ALU_RES: 0, DATA_MEM[ALU_RES]: 0, REG1: 100, REG2: 0, REG3: 0, REG4: 0}
+DEBUG:root:JMP CONST [-2] {TICK: 8, PC: 2, ALU_RES: 0, DATA_MEM[ALU_RES]: 0, REG1: 100, REG2: 0, REG3: 0, REG4: 0}
+DEBUG:root:READ REG [1] {TICK: 9, PC: 0, ALU_RES: 0, DATA_MEM[ALU_RES]: 0, REG1: 100, REG2: 0, REG3: 0, REG4: 0}
 WARNING:root:Input buffer is empty!
 INFO:root:output_buffer: asd
 asd
