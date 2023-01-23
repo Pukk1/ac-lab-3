@@ -17,8 +17,8 @@ output: |
 
   instr_counter:  3 ticks: 4
 log: |
-  DEBUG    root:machine.py:286 LD REG_CONST [1, 0] {TICK: 0, PC: 0, ALU_RES: 0, DATA_MEM[ALU_RES]: 1, REG1: 0, REG2: 0, REG3: 0, REG4: 0}
-  DEBUG    root:machine.py:286 ADD REG_REG_CONST [1, 1, 10000] {TICK: 2, PC: 1, ALU_RES: 0, DATA_MEM[ALU_RES]: 1, REG1: 1, REG2: 0, REG3: 0, REG4: 0}
-  DEBUG    root:machine.py:286 ST REG_CONST [1, 0] {TICK: 3, PC: 2, ALU_RES: 10001, DATA_MEM[ALU_RES]: None, REG1: 10001, REG2: 0, REG3: 0, REG4: 0}
-  DEBUG    root:machine.py:286 HLT NONE [] {TICK: 4, PC: 3, ALU_RES: 0, DATA_MEM[ALU_RES]: 10001, REG1: 10001, REG2: 0, REG3: 0, REG4: 0}
-  INFO     root:machine.py:302 output_buffer: 
+  DEBUG    root:machine.py:324 LD REG_CONST [1, 0] {TICK: 0, PC: 0, ALU_RES: 0, DATA_MEM[ALU_RES]: 1, REG1: 0, REG2: 0, REG3: 0, REG4: 0}
+  DEBUG    root:machine.py:324 ADD REG_REG_CONST [1, 1, 10000] {TICK: 2, PC: 1, ALU_RES: 0, DATA_MEM[ALU_RES]: 1, REG1: 1, REG2: 0, REG3: 0, REG4: 0}
+  DEBUG    root:machine.py:324 ST REG_CONST [1, 0] {TICK: 3, PC: 2, ALU_RES: 10001, DATA_MEM[ALU_RES]: None, REG1: 10001, REG2: 0, REG3: 0, REG4: 0}
+  DEBUG    root:machine.py:324 HLT NONE [] {TICK: 4, PC: 3, ALU_RES: 0, DATA_MEM[ALU_RES]: 10001, REG1: 10001, REG2: 0, REG3: 0, REG4: 0}
+  INFO     root:machine.py:336 output_buffer: 

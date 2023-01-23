@@ -1,9 +1,9 @@
 """модуль занимается преобразованием операций из section .text и данных из section .data в набор бинарных инструкций"""
 
-from isa import Instruction, OpcodeOperandsType
-from translate.translation_regex import is_section_instr, get_section_name, is_comment_or_label, is_word_instr, \
+from src.isa import Instruction, OpcodeOperandsType
+from src.translate.translation_regex import is_section_instr, get_section_name, is_comment_or_label, is_word_instr, \
     get_word_value
-from utils import number_to_bin
+from src.utils import number_to_bin
 
 
 def create_init_bin_data(code_lines: list[str]) -> tuple[list[str], list[str]]:

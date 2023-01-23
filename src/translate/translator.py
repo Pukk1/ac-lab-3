@@ -9,11 +9,11 @@ import re
 import sys
 from typing import Optional
 
-from bin_parsing.bin_ser import create_init_bin_data, create_bin_instructions
-from isa import Opcode, Instruction, OpcodeOperandsType, OpcodeInfo
-from translate.translation_regex import is_section_instr, get_section_name, is_label_instr, is_comment_instr, \
+from src.bin_parsing.bin_ser import create_init_bin_data, create_bin_instructions
+from src.isa import Opcode, Instruction, OpcodeOperandsType, OpcodeInfo
+from src.translate.translation_regex import is_section_instr, get_section_name, is_label_instr, is_comment_instr, \
     is_comment_or_label, get_opcode_regex, OPCODE_OPERAND_TYPE_VIEW
-from utils import number_to_bin, write_code_to_file, write_code_with_mnemonics
+from src.utils import number_to_bin, write_code_to_file, write_code_with_mnemonics
 
 
 class LabelAddress:

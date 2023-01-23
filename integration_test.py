@@ -13,8 +13,8 @@ import tempfile
 
 import pytest
 
-import machine
-from translate import translator
+from src import machine
+from src.translate import translator
 
 
 # Тут используется подход golden tests. У него не самая удачная реализация для

@@ -2,7 +2,7 @@
 
 import re
 
-from isa import Opcode, OpcodeOperandsType
+from src.isa import Opcode, OpcodeOperandsType
 
 # регулярные выражения, соответствующие строкам набора аргументов, для определения типа набора аргументов
 OPCODE_OPERAND_TYPE_VIEW: dict = {

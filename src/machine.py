@@ -10,9 +10,9 @@ import logging
 import sys
 from typing import Optional
 
-from bin_parsing.bin_deser import deserialize_bin_lines_list
-from isa import Instruction, OpcodeOperandsType, Opcode
-from utils import read_bin_code_from_file, read_char_list_from_file
+from src.bin_parsing.bin_deser import deserialize_bin_lines_list
+from src.isa import Instruction, OpcodeOperandsType, Opcode
+from src.utils import read_bin_code_from_file, read_char_list_from_file
 
 
 class Alu:

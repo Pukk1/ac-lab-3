@@ -1,8 +1,8 @@
 """модуль занимается преобразованием из бинарного вида
 к набору данных инициализации из section .data и инструкций из section .text"""
 
-from isa import Instruction, OpcodeOperandsType, Opcode
-from utils import bin_to_number
+from src.isa import Instruction, OpcodeOperandsType, Opcode
+from src.utils import bin_to_number
 
 
 def get_opcode(bin_instr: str) -> Opcode:
