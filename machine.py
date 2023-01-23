@@ -24,17 +24,17 @@ class Alu:
             Opcode.ADD: lambda left, right: left + right,
             Opcode.SUB: lambda left, right: right - left,
             Opcode.MUL: lambda left, right: left * right,
-            Opcode.DIV: lambda left, right: left / right,
+            Opcode.DIV: lambda left, right: int(left / right),
             Opcode.MOD: lambda left, right: left % right,
         }
 
     def execute(self, opcode: Opcode):
         self.res = self.operations[opcode](self.op1, self.op2)
 
-        while self.res > pow(2, 32) - 1:
-            self.res -= 2 * pow(2, 32)
-        while self.res < -pow(2, 32):
-            self.res += 2 * pow(2, 32)
+        while self.res > pow(2, 31) - 1:
+            self.res -= 2 * pow(2, 31)
+        while self.res < -pow(2, 31):
+            self.res += 2 * pow(2, 31)
 
         if self.res == 0:
             self.zero = True
@@ -196,7 +196,7 @@ class ControlUnit:
         self.latch_program_counter(sig_next=True)
         self.tick()
 
-    def exec_alu_instr_with(self, opcode: Opcode, res_reg_num: int, first_arg_reg_num: int, second_arg_reg_num: int):
+    def exec_alu_instr_with_reg(self, opcode: Opcode, res_reg_num: int, first_arg_reg_num: int, second_arg_reg_num: int):
         self.data_path.reg_file.choice_ops(first_arg_reg_num, second_arg_reg_num)
         self.latch_alu(sig_const=False, opcode=opcode)
         self.data_path.latch_res(res_reg_num, sig_input=False, sig_read_data=False)
@@ -244,7 +244,7 @@ class ControlUnit:
                 res_reg_num: int = instruction.operands[0]
                 first_arg_reg_num: int = instruction.operands[1]
                 second_arg_reg_num: int = instruction.operands[2]
-                self.exec_alu_instr_with(opcode, res_reg_num, first_arg_reg_num, second_arg_reg_num)
+                self.exec_alu_instr_with_reg(opcode, res_reg_num, first_arg_reg_num, second_arg_reg_num)
 
     def __repr__(self):
         state = "{{TICK: {}, PC: {}, ALU_RES: {}, REG1: {}, REG2: {}, REG3: {}, REG4: {}}}".format(

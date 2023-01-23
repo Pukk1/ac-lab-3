@@ -27,7 +27,7 @@ def get_opcode(line: str) -> Optional[Opcode]:
 
 def get_args_sub_str(line: str, opcode: Opcode) -> str:
     args = re.split(get_opcode_regex(opcode), line)[1]
-    args.strip()
+    args = args.strip()
     return args
 
 
@@ -41,13 +41,13 @@ def get_args_list(line: str, opcode: Opcode) -> list[str]:
     return args
 
 
-def get_opcode_arg_type(args: list[str], opcode: Opcode) -> OpcodeOperandsType:
+def get_opcode_arg_type(args: list[str], opcode: Opcode, line_number: int) -> OpcodeOperandsType:
     args_sub_str = ', '.join(args)
     opcode_info: OpcodeInfo = opcode.value
     for operand_type in opcode_info.available_types:
         if re.match(OPCODE_OPERAND_TYPE_VIEW[operand_type], args_sub_str) is not None:
             return operand_type
-    assert False, 'Operands type not found for args substring: ' + args_sub_str
+    assert False, 'Operands type not found for args substring: ' + args_sub_str + ' line_number=' + str(line_number)
 
 
 class LabelAddress:
@@ -69,11 +69,12 @@ def create_labels_lists(lines: list[str]) -> dict[str, LabelAddress]:
     labels: dict[str, LabelAddress] = {}
     current_section: str = ''
     bin_lines_counter: int = 0
-    for line in lines:
-
+    for line_number, line in enumerate(lines):
+        line_number += 1
         if is_section_instr(line):
             name = get_section_name(line)
-            assert name in available_sections, 'Section=\"' + name + '\" not found in available names'
+            assert name in available_sections, 'Section=\"' + name + '\" not found in available names. line_number=' + \
+                                               str(line_number)
             current_section = name
             available_sections.remove(name)
             # тк гарвардская а-ра, то при начале новой секции начинается новая физическая память
@@ -124,7 +125,8 @@ def create_instructions(code_lines: list[str], labels: dict[str, LabelAddress]) 
     current_section: str = ''
     bin_lines_counter: int = 0
     instructions: list[Instruction] = []
-    for line in code_lines:
+    for line_number, line in enumerate(code_lines):
+        line_number += 1
         if is_section_instr(line):
             current_section = get_section_name(line)
             continue
@@ -134,11 +136,11 @@ def create_instructions(code_lines: list[str], labels: dict[str, LabelAddress]) 
                 continue
 
             opcode: Optional[Opcode] = get_opcode(line)
-            assert opcode is not None, "Unknown command: " + line
+            assert opcode is not None, "Unknown command: " + line + ' line_number=' + str(line_number)
             opcode: Opcode
             args: list[str] = get_args_list(line, opcode)
             args: list[str] = change_label_to_address(args, labels, bin_lines_counter)
-            args_type = get_opcode_arg_type(args, opcode)
+            args_type = get_opcode_arg_type(args, opcode, line_number)
 
             # if args_type is OpcodeOperandsType.REG_CONST_REG:
             #     args_type = OpcodeOperandsType.REG_REG_CONST
