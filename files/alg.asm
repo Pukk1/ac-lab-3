@@ -1,26 +1,31 @@
 section .data
-it:
-    word 3
+maxrange:
+    word 20
+count:
+    word 1
 sum:
-    word 0
+    word 20
+lstcount:
+    word 19
 section .text
 start:
-    ld reg1, it
-    ld reg2, sum
-startif:
-    mod reg0, reg1, 15
-    beq addsum
-    mod reg0, reg1, 3
-    beq addsum
-    mod reg0, reg1, 5
-    beq addsum
-iteration:
-    add reg1, reg1, 1
-    sub reg0, reg1, 1000
-    bne startif
-    print reg2
+    ld reg1, sum
+    ld reg2, lstcount
+    ld reg3, count
+startloop:
+    sub reg0, reg2, 1
+    bne loopbody
+    print reg1
     hlt
-addsum:
-    add reg2, reg2, reg1
-    jmp iteration
-
+loopbody:
+    add reg4, reg1, reg0
+adderloop:
+    mod reg0, reg1, reg2
+    beq loopcont
+    add reg1, reg1, reg4
+    jmp adderloop
+loopcont:
+    add reg3, reg3, 1
+    sub reg2, reg3, 20
+    mul reg2, reg2, -1
+    jmp startloop
