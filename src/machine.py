@@ -25,7 +25,7 @@ class Alu:
         self.zero: bool = False
         self.operations: dict = {
             Opcode.ADD: lambda left, right: left + right,
-            Opcode.SUB: lambda left, right: right - left,
+            Opcode.SUB: lambda left, right: left - right,
             Opcode.MUL: lambda left, right: left * right,
             Opcode.DIV: lambda left, right: int(left / right),
             Opcode.MOD: lambda left, right: left % right,
@@ -358,11 +358,3 @@ def main(args):
 if __name__ == '__main__':
     logging.getLogger().setLevel(logging.DEBUG)
     main(sys.argv[1:])
-
-    # store: int = 0
-    # for i in range(0, 1000):
-    #     if i % 15 == 0:
-    #         store += i
-    #     elif i % 3 == 0 or i % 5 == 0:
-    #         store += i
-    # print(store)
