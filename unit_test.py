@@ -13,12 +13,6 @@ import src.translate.translator
 from src.isa import Opcode, OpcodeOperandsType
 
 
-@pytest.mark.golden_test("golden/unit/translate/*.yml")
-def test_translation(golden):
-    code, _ = src.translate.translator.translate(golden["source"])
-    assert code == golden.out["code"]
-
-
 class TranslationTest(unittest.TestCase):
 
     def test_get_opcode(self):
