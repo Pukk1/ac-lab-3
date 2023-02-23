@@ -84,6 +84,8 @@ class DataMem:
         assert data_memory_size > 0, "Data_memory size should be non-zero"
         self.mem: list[int] = [0] * data_memory_size
         self.res: int = 0
+        self.input_connect_address: int = data_memory_size - 2
+        self.output_connect_address: int = data_memory_size - 1
 
         for i, number in enumerate(init_data):
             self.mem[i] = number
@@ -100,28 +102,26 @@ class DataPath:
         self.alu: Alu = Alu()
         self.reg_file: RegFile = RegFile()
 
-    def latch_res(self, res_reg_num: int, sig_input: bool, sig_read_data: bool):
-        if sig_input:
-            try:
-                data = int(self._input_buffer.pop(0))
-            except IndexError as data_empty_except:
-                raise EOFError() from data_empty_except
+    def latch_res(self, res_reg_num: int, sig_read_data: bool):
+        if sig_read_data:
+            data = self.data_mem.res
         else:
-            if sig_read_data:
-                data = self.data_mem.res
-            else:
-                data = self.alu.res
+            data = self.alu.res
         self.reg_file.set_reg_value(res_reg_num, data)
 
     def mem_read(self):
-        self.data_mem.res = self.data_mem.mem[self.alu.res]
+        if self.alu.res == self.data_mem.input_connect_address:
+            try:
+                self.data_mem.res = int(self._input_buffer.pop(0))
+            except IndexError as data_empty_except:
+                raise EOFError() from data_empty_except
+        else:
+            self.data_mem.res = self.data_mem.mem[self.alu.res]
 
     def mem_write(self):
         self.data_mem.mem[self.alu.res] = self.reg_file.op2
-
-    def output_write(self, sig_output: bool = True):
-        if sig_output:
-            self._output_buffer.append(self.reg_file.op2)
+        if self.alu.res == self.data_mem.output_connect_address:
+            self._output_buffer.append(self.data_mem.mem[self.alu.res])
 
     def get_output_buffer(self) -> list[int]:
         return self._output_buffer
@@ -197,26 +197,21 @@ class ControlUnit:
         self.latch_exec_alu(sig_const=True, opcode=Opcode.ADD)
         self.data_path.mem_read()
         self.tick()
-        self.data_path.latch_res(reg_num, sig_input=False, sig_read_data=True)
+        self.data_path.latch_res(reg_num, sig_read_data=True)
         self.latch_program_counter(sig_next=True)
         self.tick()
 
     def exec_print(self, reg_num: int):
-        self.data_path.reg_file.choice_ops(0, reg_num)
-        self.data_path.output_write(sig_output=True)
-        self.latch_program_counter(sig_next=True)
-        self.tick()
+        self.exec_st(reg_num, self.data_path.data_mem.output_connect_address)
 
     def exec_read(self, reg_num: int):
-        self.data_path.latch_res(reg_num, sig_input=True, sig_read_data=False)
-        self.latch_program_counter(sig_next=True)
-        self.tick()
+        self.exec_ld(reg_num, self.data_path.data_mem.input_connect_address)
 
     def exec_alu_instr_with_const(self, opcode: Opcode, res_reg_num: int, arg_reg_num: int, const_arg: int):
         self.const = const_arg
         self.data_path.reg_file.choice_ops(arg_reg_num, 0)
         self.latch_exec_alu(sig_const=True, opcode=opcode)
-        self.data_path.latch_res(res_reg_num, sig_input=False, sig_read_data=False)
+        self.data_path.latch_res(res_reg_num, sig_read_data=False)
         self.latch_program_counter(sig_next=True)
         self.tick()
 
@@ -224,7 +219,7 @@ class ControlUnit:
                                 second_arg_reg_num: int):
         self.data_path.reg_file.choice_ops(first_arg_reg_num, second_arg_reg_num)
         self.latch_exec_alu(sig_const=False, opcode=opcode)
-        self.data_path.latch_res(res_reg_num, sig_input=False, sig_read_data=False)
+        self.data_path.latch_res(res_reg_num, sig_read_data=False)
         self.latch_program_counter(sig_next=True)
         self.tick()
 
