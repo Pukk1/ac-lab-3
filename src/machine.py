@@ -10,7 +10,7 @@ import logging
 import sys
 from typing import Optional
 
-from src.bin_parsing.bin_deser import deserialize_bin_lines_list
+from src.bin_parsing.bin_deser import deserialize_bin_lines_list, ascii_code_to_binline
 from src.isa import Instruction, OpcodeOperandsType, Opcode
 from src.utils import read_bin_code_from_file, read_char_list_from_file
 
@@ -341,7 +341,9 @@ def main(args):
     assert len(args) == 2, "Wrong arguments: machine.py <code_file> <input_file>"
     code_file, input_file = args
 
-    bin_lines: list[str] = read_bin_code_from_file(code_file, 32)
+    bin_lines: list[str] = read_bin_code_from_file(code_file, 4)
+
+    bin_lines = list(map(lambda line: ascii_code_to_binline(line), bin_lines))
 
     init_data, instructions = deserialize_bin_lines_list(bin_lines)
 

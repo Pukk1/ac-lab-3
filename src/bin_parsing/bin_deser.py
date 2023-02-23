@@ -2,7 +2,7 @@
 к набору данных инициализации из section .data и инструкций из section .text"""
 
 from src.isa import Instruction, OpcodeOperandsType, Opcode
-from src.utils import bin_to_number
+from src.utils import bin_to_number, number_to_bin
 
 
 def get_opcode(bin_instr: str) -> Opcode:
@@ -82,3 +82,13 @@ def deserialize_bin_lines_list(bin_lines: list[str]) -> tuple[list[int], list[In
         instructions.append(instr)
 
     return init_data, instructions
+
+
+def ascii_code_to_binline(line: str):
+    result = ''
+    for i in range(0, 32, 8):
+        code = ord(line[:1])
+        line = line[1:]
+        code = number_to_bin(code, 8)
+        result += code
+    return result

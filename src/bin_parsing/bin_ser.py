@@ -3,7 +3,7 @@
 from src.isa import Instruction, OpcodeOperandsType
 from src.translate.translation_regex import is_section_instr, get_section_name, is_comment_or_label, is_word_instr, \
     get_word_value
-from src.utils import number_to_bin
+from src.utils import number_to_bin, bin_to_number
 
 
 def create_init_bin_data(code_lines: list[str]) -> tuple[list[str], list[str]]:
@@ -65,3 +65,13 @@ def create_bin_instructions(instructions: list[Instruction]) -> tuple[list[str],
         bin_instruction = bin_args_by_type(instruction.operands.copy(), instruction.operands_type) + bin_instruction
         bin_instructions.append(bin_instruction)
     return bin_instructions, instructions
+
+
+def binline_to_ascii_code(line: str):
+    result = ''
+    for i in range(0, 32, 8):
+        code = line[:8]
+        code = bin_to_number(code, False)
+        result += chr(code)
+        line = line[8:]
+    return result

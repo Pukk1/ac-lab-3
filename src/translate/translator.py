@@ -9,7 +9,7 @@ import re
 import sys
 from typing import Optional
 
-from src.bin_parsing.bin_ser import create_init_bin_data, create_bin_instructions
+from src.bin_parsing.bin_ser import create_init_bin_data, create_bin_instructions, binline_to_ascii_code
 from src.isa import Opcode, Instruction, OpcodeOperandsType, OpcodeInfo
 from src.translate.translation_regex import is_section_instr, get_section_name, is_label_instr, is_comment_instr, \
     is_comment_or_label, get_opcode_regex, OPCODE_OPERAND_TYPE_VIEW
@@ -186,6 +186,7 @@ def translate(program_text: str) -> tuple[list[str], list[str]]:
     mnemonics_instructions = list(map(lambda instr: str(instr), instructions))
     code.extend(bin_instructions)
     mnemonics.extend(mnemonics_instructions)
+    code = list(map(lambda it: binline_to_ascii_code(it), code))
     return code, mnemonics
 
 
